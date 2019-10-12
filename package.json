@@ -1,0 +1,31 @@
+{
+  "name": "webserver",
+  "description": "Examples using Koa",
+  "version": "0.0.1",
+  "repository": "https://github.com/f4f5/webserver",
+  "dependencies": {
+    "koa": "^2.2.0",
+    "koa-basic-auth": "^2.0.0",
+    "koa-body": "^4.0.8",
+    "koa-compose": "^4.0.0",
+    "koa-csrf": "^3.0.6",
+    "koa-json": "^2.0.2",
+    "koa-logger": "^3.0.0",
+    "koa-nunjucks-2": "^3.0.2",
+    "koa-router": "^7.2.0",
+    "koa-session": "^5.0.0",
+    "koa-static": "^3.0.0",
+    "nodemailer": "^6.3.1",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4",
+    "require-json": "0.0.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "make test"
+  },
+  "engines": {
+    "node": ">= 7.6"
+  },
+  "license": "MIT"
+}

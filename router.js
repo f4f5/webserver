@@ -1,137 +1,131 @@
 const router = require('koa-router')();
 const fs = require('fs');
-const servernet = require('./servernet');
 const request = require('request-promise');
-const config = require('./nodeconfig');
 const sign = require('./signupandlogin');
 
-const ServerNet = new servernet(config.server_name, config.server_address);
-
-ServerNet.initServerNet();
-
-var initThisServer = function(){
-    if(ServerNet.mainnode == ServerNet.address){
-        ServerNet.prepare4MainNode();
-        ServerNet.checkInvalidNode();        
-    }else{
-        ServerNet.autoFollowMainNode();
-        if(ServerNet.allservers.indexOf(ServerNet.address) == -1){
-            //request the mainnode to addnode
-            var options = {
-                method: 'POST', uri: ServerNet.mainnode +'/netnode_addnode', 
-                body: {
-                    server: ServerNet.servername,
-                    address: ServerNet.address
-                },
-                json: true
-            };
-            request(options);
-        }
-    }
-    fs.writeFile('./netnode.json', JSON.stringify(ServerNet.netnode),(err)=>{});    
-}
-
-setInterval(initThisServer,20000);
-
-router.post('/netnode_addnode',async(ctx, next)=>{
-    if(ServerNet.mainnode != ServerNet.address){
-        return ctx.body ='0';
-    }
-    var server = ctx.request.body.server;
-    var address = ctx.request.body.address;   
-    if(server && address){
-        request.post(address + '/netnode_ping')
-            .then((body)=> {
-                if(body == '1'){
-                    if(!ServerNet.addNode(server, address)){
-                        return ctx.body = '0';
-                    }
-                    for(var ser in ServerNet.netnode){
-                        for(var addr in ServerNet.netnode[ser]){
-                            var options = {method: 'POST', uri: ServerNet.netnode[ser][addr] +'/netnode_receivenode', 
-                                body: {
-                                    server: server,
-                                    address: address
-                                },
-                                json: true // Automatically stringifies the body to JSON
-                            };
-                            request(options);
-                        }
-                    }
-                }
-                
-            }).catch((err)=>{
-                console.log('the error is: '+err);
-            }); 
-        return ctx.body='1';       
-    }
-    return ctx.body = '0';    
-});
-
-router.post('/netnode_receivenode',async(ctx, next)=>{
-    var server = ctx.request.body.server;
-    var address = ctx.request.body.address;
-    if(server && address){
-        request.post(address+'/netnode_ping').then((body)=> {
-            if(body == '1'){
-                ServerNet.addNode(server, address);
-            }
-        });        
-    }
-    ctx.body = '1';
-});
-
-router.post('/netnode_deletenode',async(ctx, next)=>{
-    var server = ctx.request.body.server;
-    var address = ctx.request.body.address;    
-    ServerNet.deleteNode(server, address);   
-    ctx.body = '1';
-});
-
-router.post('/netnode_ping', async(ctx, next)=>{
-    ctx.body = '1';
-});
-
-router.post('/netnode_allserversjson', async(ctx, next)=>{
-    ctx.body = ServerNet.netnode;
-});
-
-router.post('/netnode_setmainnode', async(ctx, next)=>{
-    console.log('setmainnode info:');
-    console.log(ctx.request.body);
-    var bjson = ctx.request.body;    
-    if(ServerNet.allservers.indexOf(bjson.enroll) == -1 || ServerNet.allservers.indexOf(bjson.main) == -1){
-        return ctx.body = '0';
-    }
-    ServerNet.mainnode = bjson.main;
-    if(ServerNet.address == ServerNet.mainnode){
-        ServerNet.prepare4MainNode();
-    }
-    return ctx.body = '1';
-});
-
-router.post('/netnode_allinfo', async(ctx, next)=>{
-    ctx.body = {
-        netnode: ServerNet.netnode,
-        mainnode: ServerNet.mainnode,
-        allservers: ServerNet.allservers
-    }    
-});
 
 ///////////////////////////////////////////////////
-router.get('/', async (ctx, next) => {
-    await ctx.render('index', {
+router.get('/mywallet', async (ctx, next) => {
+    await ctx.render('mywallet', {
         title: 'UNION',
         content:'sssssssssssssssss'
     });
 });
 
-router.get('/signup', async(ctx, next)=>{
-    await ctx.render('signup', {
-        title: 'UNION-Signup'
+router.get('/pricehistory', async(ctx, next)=>{
+    await ctx.render('pricehistory', {
+        
     });
 });
 
+router.get('/detail', async (ctx, next) => {
+    await ctx.render('detail', {
+        title: 'UNION',
+        content:'sssssssssssssssss'
+    });
+});
+
+router.get('/signup', async (ctx, next) => {
+    await ctx.render('signup', {
+        title: 'UNION',
+        content:'sssssssssssssssss'
+    });
+});
+
+router.get('/netnode', async (ctx, next) => {
+    await ctx.render('netnode', {
+        title: 'UNION',
+        content:'sssssssssssssssss'
+    });
+});
+
+router.get('/introduce', async (ctx, next) => {
+    await ctx.render('introduce', {
+        title: 'UNION',
+        content:'sssssssssssssssss'
+    });
+});
+router.get('/', async (ctx, next) => {
+    const cell = {
+        'url':'http://localhost:8080',
+        'img':'/s/img/test.png',
+        'des':'hello world'
+    }
+    let servers = 't'.repeat(9).split('t').map(x=>cell)
+    await ctx.render('navigate', {
+        title: 'UNION',
+        servers: servers
+    });
+});
+router.get('/pricehistory', async (ctx, next) => {
+    await ctx.render('pricehistory', {
+        title: 'UNION',
+        content:'sssssssssssssssss'
+    });
+});
+
+
+ 
+router.get('/tem_for_pricehistory', async(ctx, next) =>{
+    /**
+     *  0: "2011-01-01↵00:01:00"
+        1: 3765.34   O
+        2: 3765.34   H
+        3: 3761.34   L
+        4: 3763.21   C
+        5: "3841987" V
+        6: -1        Sign
+     */
+    
+});
+
+/*
+async def fetch_price_history(request):
+    """
+        0: "2011-01-01↵00:01:00"
+        1: 3765.34   O
+        2: 3765.34   H
+        3: 3761.34   L
+        4: 3763.21   C
+        5: "3841987" V
+        6: -1        Sign
+    """
+    start = datetime.timestamp(datetime.now()) - 10*365*24*3600
+    def parsetime(n):
+        now = start + n * 3600        
+        return datetime.strftime(datetime.fromtimestamp(now), "%Y-%m-%d\n%H:%M:%S")
+    
+    sdata = [3765.34, 3769.34, 3760.31, 3767.23, '283823', 1]    
+    ldata = sdata.copy()
+    def parsedata():
+        ran = random.random()
+        if ran>0.5:
+            sign=1
+        else:
+            sign=-1
+        scale = 100*(ran-0.5)
+        
+        if sign>0:
+            ldata[0] = ldata[3] + ran*10  #open
+            ldata[3] +=scale  #close
+            ldata[2] = ldata[0] - random.random()*40 #low
+            ldata[1] = ldata[3] + random.random()*40 #high
+            ldata[4] = str(int(100000*random.random()))
+            ldata[5] = sign
+        else:
+            ldata[0] = ldata[3] - ran*10 #open
+            ldata[3] +=scale                #close
+            ldata[2] = ldata[3] - random.random()*40 #low
+            ldata[1] = ldata[0] + random.random()*50  #high
+            ldata[4] = str(int(10000*random.random()))
+            ldata[5] = sign
+        return ldata.copy()
+          
+    data = [[parsetime(i), *parsedata()] for i in range(10000)]
+    return web.json_response(data)
+ */
+
+/**********POST***********POST**********POST************POST*********/
 router.post('/signup_emailcheck',async(ctx, next)=>{
     await sign.checkEmail(ctx);
 });
@@ -140,10 +134,191 @@ router.post('/signup_signup',async(ctx, next)=>{
     await sign.signup(ctx);
 })
 
-router.get('/json', async (ctx, next) => {
-    ctx.body = {
-        title: 'koa2 json'
-    }
+router.post('/send_info_to', async (ctx, next) => {
+    ctx.body = 'hello'
 });
 
+router.post('/mywallet_trade_data',async (ctx,next) => {
+    let k='1,2,3,4,5;'.repeat(10).split(';')
+    k.splice(-1)
+    k=k.map(x=>x.split(','))
+    console.log(k)
+    ctx.body = k
+})
+
 module.exports = router;
+
+
+/*
+
+@routes.get('/mywallet')
+@aiohttp_jinja2.template('mywallet.html')
+async def handler1(request):
+    return {'name': 'Andrew', 'surname': 'Svetlov'}
+
+@routes.get('/pricehistory')
+@aiohttp_jinja2.template('pricehistory.html')
+async def handler_ph(request):
+    return
+
+@routes.get('/detail')
+@aiohttp_jinja2.template('detail.html')
+async def handler2(request):
+    return {'name': 'Andrew', 'surname': 'Svetlov'}
+
+
+@routes.get('/signup')
+@aiohttp_jinja2.template('signup.html')
+async def handler3(request):
+    return {'name': 'Andrew', 'surname': 'Svetlov'}
+
+
+@routes.get('/netnode')
+@aiohttp_jinja2.template('netnode.html')
+async def handler4(request):
+    return {'name': 'Andrew', 'surname': 'Svetlov'}
+
+@routes.get('/introduce')
+@aiohttp_jinja2.template('intro.html')
+async def handler5(request):
+    session = await get_session(request)
+    last = session['last'] if 'last' in session else None
+    print(last,'  ssssss', session)
+    session['last'] = 5555555
+    return {'name': 'Andrew', 'surname': 'Svetlov'}
+
+@routes.get('/')
+@aiohttp_jinja2.template('navigate.html')
+async def handler6(request):
+    servers=[
+        {
+            'url':'http://localhost:8080',
+            'img':'/s/img/test.png',
+            'des':'hello world'
+        }
+    ]*9
+    return {'servers': servers, 'surname': 'Svetlov'}
+
+@routes.get('/pricehistory')
+@aiohttp_jinja2.template('pricehistory.html')
+async def render_history_data(request):
+   return
+
+@routes.post('/signup_emailcheck')
+async def check_email(request):
+    return web.Response(text=await sign.checkEmail(request))
+
+@routes.post('/signup_signup')
+async def signup(request):    
+    return web.Response(text=await sign.signup(request))
+
+@routes.post('/signup_login')
+async def login(request):
+    return web.Response(text=await sign.login(request))
+
+@routes.post('/mywallet_trade_data')
+async def fetch_trade_data(request):
+    data = [[1,2,3,4,5]]*10
+    return web.json_response(data)
+
+@routes.get('/tem_for_pricehistory')
+async def fetch_price_history(request):
+    """
+        0: "2011-01-01↵00:01:00"
+        1: 3765.34   O
+        2: 3765.34   H
+        3: 3761.34   L
+        4: 3763.21   C
+        5: "3841987" V
+        6: -1        Sign
+    """
+    start = datetime.timestamp(datetime.now()) - 10*365*24*3600
+    def parsetime(n):
+        now = start + n * 3600        
+        return datetime.strftime(datetime.fromtimestamp(now), "%Y-%m-%d\n%H:%M:%S")
+    
+    sdata = [3765.34, 3769.34, 3760.31, 3767.23, '283823', 1]    
+    ldata = sdata.copy()
+    def parsedata():
+        ran = random.random()
+        if ran>0.5:
+            sign=1
+        else:
+            sign=-1
+        scale = 100*(ran-0.5)
+        
+        if sign>0:
+            ldata[0] = ldata[3] + ran*10  #open
+            ldata[3] +=scale  #close
+            ldata[2] = ldata[0] - random.random()*40 #low
+            ldata[1] = ldata[3] + random.random()*40 #high
+            ldata[4] = str(int(100000*random.random()))
+            ldata[5] = sign
+        else:
+            ldata[0] = ldata[3] - ran*10 #open
+            ldata[3] +=scale                #close
+            ldata[2] = ldata[3] - random.random()*40 #low
+            ldata[1] = ldata[0] + random.random()*50  #high
+            ldata[4] = str(int(10000*random.random()))
+            ldata[5] = sign
+        return ldata.copy()
+          
+    data = [[parsetime(i), *parsedata()] for i in range(10000)]
+    return web.json_response(data)
+
+@routes.post('/send_info_to')
+async def handle_info(request):
+    data = await request.post()
+    """
+    data description:
+    * fabric client result:
+        signup login query transfer etc.
+    * connetcor result:
+        server list search result
+    * same type server message exchange    
+    """
+    return web.Response(text='1')
+
+async def start_background_tasks(app):
+    app['kickout'] = app['loop'].create_task(sign.kickout(app))
+
+# async def cleanup_background_tasks(app):
+#     print('into clean up')
+#     app['kickout'].cancel()
+#     await app['kickout']
+
+@web.middleware
+async def server_redirect(request, handler):    
+    cookies = request.cookies
+    # print('server redirect s', ' the cookie is: ',cookies)    
+    location = cookies.get('redirect')
+    if location:
+        raise web.HTTPFound('https://github.com')
+    else:
+        response = await handler(request)
+        # print('server redirect e')
+        return response
+
+async def init(app):
+    """
+    request connector to fetch info
+    """
+    with open('./config.json','r') as f:
+        appinfo = json.load(f)
+    for k in appinfo:
+        app[k] = appinfo[k] 
+
+    #initialize redis
+    # app['redis'] = await aioredis.create_redis_pool(
+    #     'redis://localhost',
+    #     minsize=5, maxsize=10,
+    #     loop=app['loop'])
+    
+    #requst connector for  
+    # path = '/get_server/'
+    # for item in appinfo['require_type']:
+    #     path += item+'&'       
+    # ans = await utils.sureAnswer(appinfo['connectors'], path.strip('&'))
+    # for item in appinfo['require_type']:
+    #     app[item] = ans[item]  
+*/

@@ -5,11 +5,10 @@ const json = require('koa-json');
 const koaBody = require('koa-body');
 const logger = require('koa-logger');
 const serve = require('koa-static');
-const logger = require('koa-logger');
 const session = require('koa-session');
 const CSRF = require('koa-csrf');
-const router = require('koa-router')();
-const config = require('./nodeconfig');
+const config = JSON.parse(require('fs').readFileSync('config.json', 'utf8'));
+const router = require('./router');
 const path = require('path');
 const app = new Koa();
 
@@ -27,7 +26,7 @@ app.use(koaNunjucks({
 
 app.keys = ['session key', 'csrf example'];
 app.use(session(app));
-app.use(new CSRF());
+// app.use(new CSRF());
 
 // logger
 app.use(logger());
