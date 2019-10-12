@@ -1,0 +1,182 @@
+{% extends "default.html" %}
+
+{% block title %}{{title}}{% endblock %}
+{% block header %}
+<!-- Custom styles for this template -->
+{% endblock %}
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm" style="height: 10em;">
+            <img src="/s/img/test.png" style="height: 100%;">
+        </div>
+
+        <div class="col-sm text-muted" style="height: 10em;">
+            <div><em>nickName: </em> jsiajks</div>
+            <div><em>Date:</em>  sjkgj</div>
+
+        </div>
+    </div>
+    <div style="height: 3em;" class="row align-items-center">        
+        <div class="col-5 font-weight-bold">
+            Wallet Address:            
+        </div> 
+        <div class="col-5">
+            ________
+        </div>         
+    </div> 
+    <div style="height: 3em;" class="row align-items-center">        
+        <div class="col-5 font-weight-bold">
+            Account Balance:            
+        </div> 
+        <div class="col-5">
+            ________
+        </div>         
+    </div> 
+
+    <div style="height: 5em;" class="row align-items-center">
+        <div class="col-10" id="collapseButtons" onclick="collapseClick();">
+            <button type="button" class="btn btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">寄售</button>
+            <button type="button" class="btn btn btn-primary active" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">寄售行</button>
+            <button type="button" class="btn btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">我的寄售</button>
+            <button type="button" class="btn btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">寄售历史</button>
+            <button type="button" class="btn btn btn-primary" type="button" >行情数据</button>
+        </div>
+    </div>
+
+    <div class="collapse" id="collapseOne">
+        <div class="card card-body">
+            <form>
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label for="inputEmail4">Email</label>
+                    <input type="email" class="form-control" id="inputEmail4" placeholder="Email">
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label for="inputPassword4">Password</label>
+                    <input type="password" class="form-control" id="inputPassword4" placeholder="Password">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="inputAddress">Address</label>
+                  <input type="text" class="form-control" id="inputAddress" placeholder="1234 Main St">
+                </div>
+                <div class="form-group">
+                  <label for="inputAddress2">Address 2</label>
+                  <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
+                </div>
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label for="inputCity">City</label>
+                    <input type="text" class="form-control" id="inputCity">
+                  </div>
+                  <div class="form-group col-md-4">
+                    <label for="inputState">State</label>
+                    <select id="inputState" class="form-control">
+                      <option selected>Choose...</option>
+                      <option>...</option>
+                    </select>
+                  </div>
+                  <div class="form-group col-md-2">
+                    <label for="inputZip">Zip</label>
+                    <input type="text" class="form-control" id="inputZip">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="gridCheck">
+                    <label class="form-check-label" for="gridCheck">
+                      Check me out
+                    </label>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Sign in</button>
+              </form>
+        </div>
+    </div>
+
+    <div class="collapse show" id="collapseTwo">
+        <div class="card card-body">
+            <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th scope="col">Address</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Amout</th>
+                    <th scope="col">Credit</th>
+                    <th scope="col">Exchange For</th>
+                    <th scope="col">Pay Method</th>
+                  </tr>
+                </thead>
+                <tbody id="TradeTable">
+                  
+                </tbody>
+              </table>
+        </div>
+    </div>
+    <div class="collapse" id="collapseThree">
+        <div class="card card-body">
+            <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th scope="col">Price</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Exchange For</th>
+                    <th scope="col">Pay Method</th>
+                  </tr>
+                </thead>
+                <tbody id="MyTrade">
+                  
+                </tbody>
+              </table>
+        </div>
+    </div>
+    <div class="collapse" id="collapseFour">
+        <div class="card card-body">
+            <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">ToAddress</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Result</th>
+                  </tr>
+                </thead>
+                <tbody id="TradeHistory">
+                </tbody>
+              </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/s/js/mywallet.js"></script>
+<script>        
+    $((function(){
+        $('#collapseButtons button').click(function(){
+            $(this).addClass('active').siblings().removeClass('active')
+        })
+        loadDataAndRender('/mywallet_trade_data', {
+            option: 'all_kind',
+            startIndex: 0,
+            dataNum: 100
+        }, renderTable, '#TradeTable');
+        loadDataAndRender('/mywallet_trade_data', {
+            option: 'all_kind',
+            startIndex: 0,
+            dataNum: 100
+        }, renderTable, '#MyTrade');
+        loadDataAndRender('/mywallet_trade_data', {
+            option: 'all_kind',
+            startIndex: 0,
+            dataNum: 100
+        }, renderTable, '#TradeHistory');
+    })());
+    var collapseClick=function(){
+        $('.collapse').collapse('hide');        
+    }
+</script>
+{% endblock %}
