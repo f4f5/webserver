@@ -23,8 +23,14 @@ app.use(koaNunjucks({
       trimBlocks: true
     }
   }));
-
+app.passwordExp = '^(?=.*[a-zA-Z])(?=.*[0-9])[A-Za-z0-9]{8,18}$';
+app.nicknameExp = '^(?=.*[a-zA-Z])(?=.*[0-9])[A-Za-z0-9]{1,16}$';
+app.emailExp = '^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+{3,26}$'
+app.accountTableNum = config.accountTableNum
+app.tableMaxRecord = config.tableMaxRecord
+app.id2Table = x=>Math.ceil(x/app.tableMaxRecord)
 app.keys = ['session key', 'csrf example'];
+app.proxy = true;
 app.use(session(app));
 // app.use(new CSRF());
 
