@@ -1,6 +1,7 @@
 "use strict";
 const nodemailer = require("nodemailer");
 const db = require('./database');
+const utils = require('./utils');
 
 class SignupLogin {
     static async sendMail(toaddress, ecode) {
@@ -128,33 +129,16 @@ class SignupLogin {
          */
         // set the cookie
         ctx.session.login = id;
-
-        // binding ip to session to reduce insecure.
-        let ip = ctx.request.ip
-        let ips = ctx.request.ips
-        if(!ips.includes(ip)){
-            ips.unshift(ip);
-        }
-        ip = ''
-        while(1){
-            ip+=ips.shift();
-            if(ips.length==0) break;
-        }
-        ips=ip.split('.')
-        let iphash = 0
-        for(let i in ips){
-            iphash+=parseInt(ips[i])||0;
-        }
-        ctx.session.ip = iphash;  //set the ip hash for later validation.
-
+        ctx.session.identity = utils.clientIdentify(ctx);        
         //query for other infomation to response client if necessary.
         if(!result['haswallet']){
             return ctx.body = result;
         }
         [rows, _] = await db.query(`SELECT * FROM wallet_${tb_n} WHERE id = ?`,[id]);
         result = {...result, ...rows[0]}
+        delete result.salt;
         [rows, _] = await db.query(`SELECT * FROM transfer_${tb_n} WHERE id = ?`,[id]);
-        result = {...result, ...rows[0]}
+        result = {...result, ...rows[0]}        
         return ctx.body = result;
     }
 }

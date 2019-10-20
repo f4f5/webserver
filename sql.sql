@@ -15,6 +15,8 @@ CREATE TABLE IF NOT EXISTS `account_1` (
 CREATE TABLE IF NOT EXISTS `wallet_1` (
   `id` int NOT NULL PRIMARY KEY,
   `public_key` varchar(60) NOT NULL UNIQUE,
+  `salt` varchar(8) NOT NULL, 
+  `credit` float unsigned zerofill DEFAULT 0,
   `balance` float signed zerofill DEFAULT 0,
   `status` tinyint(2) signed zerofill DEFAULT 0,
   `pending` int unsigned zerofill DEFAULT 0,
