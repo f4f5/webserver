@@ -1,5 +1,17 @@
 "use strict";
+const {createHash} = require('crypto');
 
+
+/**
+ * @param {string} algorithm
+ * @param {any} content
+ *  @return {string}
+ */
+const encrypt =(algorithm, content)=>{
+    let hash = createHash(algorithm)
+    hash.update(content)
+    return hash.digest('base64')
+}
 
 module.exports = {
 
@@ -38,5 +50,15 @@ module.exports = {
             uanum_str = ''+uanum
         }
         return '' + (uanum + iphash)%4294967291
-    }
+    },
+
+    
+
+    /**
+     * @param {any} content
+     *  @return {string}
+     */
+    sha1(content){encrypt('sha1', content)}
+
+
 }

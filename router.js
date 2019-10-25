@@ -134,6 +134,8 @@ router.post('/signup_signup',async(ctx, next)=>{
     await sign.signup(ctx);
 })
 
+router.post('')
+
 router.post('/send_info_to', async (ctx, next) => {
     ctx.body = 'hello'
 });

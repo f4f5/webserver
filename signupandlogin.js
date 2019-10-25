@@ -141,6 +141,12 @@ class SignupLogin {
         result = {...result, ...rows[0]}        
         return ctx.body = result;
     }
+
+    /**
+     * 
+     */
+    
+
 }
 SignupLogin.emailcode = {}
 
